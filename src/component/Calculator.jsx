@@ -1,6 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 import "./calculator.css"
+import ToggleTheam from './ToggleTheam';
 const Calculator = () => {
+
+    const [calc, setCalc] = useState('');
+    const [result, setResult] = useState('');
+
+    const opers = [ '/', '*', '+', '-', '.'];
+
+    const updateCalc = value => {
+        if  (
+                opers.includes(value) && calc === '' ||
+                opers.includes(value) && opers.includes(calc.slice(-1))
+            ) {
+                return;
+            }
+            setCalc(calc + value);
+            if(!opers.includes(value)) {
+                setResult(eval(calc + value).toString());
+            }
+    }
 
     const createDigits = () => {
 
@@ -8,7 +27,11 @@ const Calculator = () => {
 
         for(let i = 1; i < 10; i++) {
             digits.push(
-                <button key={i}>{i}</button>
+                <button 
+                    onClick={()=> updateCalc(i.toString())}
+                    key={i}>
+                        {i}
+                </button>
                 
             )
             
@@ -16,26 +39,43 @@ const Calculator = () => {
         return digits
     }
 
+    const handleCalc = () => {
+        setCalc(eval(calc).toString());
+    }
+
+    const handleDelete = () => {
+        if(calc == '') {
+            return;
+        }
+        const value = calc.slice(0, -1);
+
+        setCalc(value);
+        setResult(value);
+    }
+
     return (
       <div className="main-div">
           <div className="calculator">
+              <ToggleTheam />
               <div className="display">
-                  <span>(0)</span>0
+                  {result ? <span>({result})</span> : ''}&nbsp;
+                  {calc || '0'}
               </div>
 
               <div className="operations">
-                  <button>/</button>
-                  <button>*</button>
-                  <button>+</button>
-                  <button>-</button>
-                  <button>DEL</button>
+                  <button onClick={()=> updateCalc('/')}>/</button>
+                  <button onClick={()=> updateCalc('*')}>*</button>
+                  <button onClick={()=> updateCalc('+')}>+</button>
+                  <button onClick={()=> updateCalc('-')}>-</button>
+                  
+                  <button onClick={handleDelete}>DEL</button>
               </div>
 
               <div className="digits">
                   {createDigits()}
-                  <button>0</button>
-                  <button>.</button>
-                  <button> = </button>
+                  <button onClick={()=> updateCalc('0')}>0</button>
+                  <button onClick={()=> updateCalc('.')}>.</button>
+                  <button onClick={handleCalc}> = </button>
               </div>
           </div>
       </div>
